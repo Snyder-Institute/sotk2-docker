@@ -11,21 +11,26 @@
 #
 #   ./build.sh push   [version]     # build multi-arch (linux/amd64 + linux/arm64)
 #                                   # and push directly to Docker Hub. Tags:
-#                                   #   thebiohub/sotk2:<version>   (default 1.0.0)
+#                                   #   thebiohub/sotk2:<version>   (default 1.1.0)
 #                                   #   thebiohub/sotk2:latest
 #                                   # Requires docker login as a member of the
 #                                   # 'thebiohub' org.
 #
 # Environment overrides:
-#   APP_SRC=/path/to/ShinyApps-devel/sotk2   (default ~/Documents/GitHub/ShinyApps-devel/sotk2)
+#   APP_SRC=/path/to/sotk2-shiny             (default ~/Documents/GitHub/sotk2-shiny)
 #   BUILDER=sotk2-multiarch                  (the buildx builder to use)
+#
+# Pre-flight: APP_SRC/data/ must contain soObj.RDS, nmfRes_*.RDS, and
+# annot_GLASS.RDS (populated by `Rscript scripts/setup_data.R` in sotk2-shiny).
+# The image bakes them in. The Tutorial reads nmfRes_* / annot_GLASS in both
+# modes; lite mode additionally requires soObj.RDS at startup.
 #
 set -euo pipefail
 
 MODE="${1:-}"
-VERSION="${2:-1.0.0}"
+VERSION="${2:-1.1.0}"
 IMAGE="thebiohub/sotk2"
-APP_SRC="${APP_SRC:-$HOME/Documents/GitHub/ShinyApps-devel/sotk2}"
+APP_SRC="${APP_SRC:-$HOME/Documents/GitHub/sotk2-shiny}"
 BUILDER="${BUILDER:-sotk2-multiarch}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -42,7 +47,31 @@ fi
 
 if [[ ! -d "${APP_SRC}" ]]; then
         echo "ERROR: Shiny app source not found at: ${APP_SRC}" >&2
-        echo "       Set APP_SRC=/path/to/ShinyApps-devel/sotk2 and retry." >&2
+        echo "       Set APP_SRC=/path/to/sotk2-shiny and retry." >&2
+        exit 1
+fi
+
+# Pre-flight: confirm data/ is populated. The Tutorial steps read nmfRes_* and
+# annot_GLASS in both modes; lite mode additionally requires soObj.RDS at startup.
+required_data=(
+        "data/soObj.RDS"
+        "data/nmfRes_GLASS.RDS"
+        "data/nmfRes_IVYGAP.RDS"
+        "data/nmfRes_HEILAND.RDS"
+        "data/annot_GLASS.RDS"
+)
+missing=()
+for f in "${required_data[@]}"; do
+        if [[ ! -e "${APP_SRC}/${f}" ]]; then
+                missing+=("${f}")
+        fi
+done
+if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "ERROR: required demo data missing in ${APP_SRC}:" >&2
+        for f in "${missing[@]}"; do echo "  - ${f}" >&2; done
+        echo >&2
+        echo "Populate it with:" >&2
+        echo "  cd ${APP_SRC} && Rscript scripts/setup_data.R" >&2
         exit 1
 fi
 
@@ -75,10 +104,11 @@ case "${MODE}" in
                         "${APP_SRC}"
                 echo
                 echo "Built: ${IMAGE}:local (${PLATFORM}, in local docker)"
-                echo "Test it (auto-open browser):"
+                echo "Test it (auto-open browser, full mode by default):"
                 echo "  IMAGE=${IMAGE}:local ${SCRIPT_DIR}/launch.sh"
                 echo "or manually:"
                 echo "  docker run --rm -p 11630:11630 ${IMAGE}:local"
+                echo "  docker run --rm -p 11630:11630 -e SOTK2_MODE=lite ${IMAGE}:local"
                 echo "  open http://localhost:11630"
                 ;;
         push)

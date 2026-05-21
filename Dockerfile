@@ -4,11 +4,15 @@
 #
 # Build is driven by ./build.sh which targets buildx. Two modes:
 #   ./build.sh local            # native arch only, --load into local docker
-#   ./build.sh push 1.0.0       # multi-arch (linux/amd64 + linux/arm64), --push
+#   ./build.sh push 1.1.0       # multi-arch (linux/amd64 + linux/arm64), --push
 #
-# Run:
-#   docker run --rm -p 3838:3838 thebiohub/sotk2:1.0.0
-#   open http://localhost:3838
+# Run (default mode is FULL - every input live):
+#   docker run --rm -p 11630:11630 thebiohub/sotk2:1.1.0
+#   open http://localhost:11630
+#
+# Override at runtime for LITE (browse-only, recompute disabled — used for
+# internal/public-facing deployments):
+#   docker run --rm -p 11630:11630 -e SOTK2_MODE=lite thebiohub/sotk2:1.1.0
 #
 
 FROM rocker/r-ver:4.5
@@ -41,13 +45,20 @@ RUN R -e "options(Ncpus = parallel::detectCores()); \
         stopifnot('sotk2' %in% installed.packages()[,1])"
 
 # --- App bundle
-# Build context is the Shiny app dir (~/Documents/GitHub/ShinyApps-devel/sotk2).
+# Build context is the sotk2-shiny dir (~/Documents/GitHub/sotk2-shiny).
 # Bundle layout inside the image:
 #   /srv/shiny-server/sotk2/{app.R, Rsource/, data/, www/, *.md, *.html}
+# IMPORTANT: data/ must be populated on the host before build (it is gitignored
+# in sotk2-shiny). Run `Rscript scripts/setup_data.R` once in sotk2-shiny/ to
+# fetch the demo data and build the precomputed soObj.RDS.
 COPY . /srv/shiny-server/sotk2/
+
+# --- Runtime mode default: full (every input live). Override with
+#     `docker run -e SOTK2_MODE=lite ...` for browse-only deployments.
+ENV SOTK2_MODE=full
 
 EXPOSE 11630
 
 # Run sotk2 directly (one R process per container; no shiny-server daemon).
 CMD ["R", "--quiet", "--no-save", "-e", \
-        "shiny::runApp('/srv/shiny-server/sotk2', host='0.0.0.0', port=11630)"]
+        "cat('\\nsotk2 is starting. Once ready, open http://localhost:11630 in your browser.\\n\\n'); shiny::runApp('/srv/shiny-server/sotk2', host='0.0.0.0', port=11630)"]

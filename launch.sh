@@ -11,7 +11,7 @@
 #
 # Usage:
 #   ./launch.sh                       # uses latest pulled image
-#   IMAGE=thebiohub/sotk2:1.0.0 ./launch.sh
+#   IMAGE=thebiohub/sotk2:1.1.0 ./launch.sh
 #   HOST_PORT=8080 ./launch.sh        # remap container's 11630 to a different host port
 #
 set -euo pipefail
