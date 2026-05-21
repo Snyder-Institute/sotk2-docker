@@ -2,7 +2,7 @@
 
 Docker packaging for the [sotk2](https://github.com/Snyder-Institute/sotk2) Shiny app. The image bundles the demo data so a single `docker run` is sufficient to explore the package end to end without local R setup.
 
-Image registry: <https://hub.docker.com/r/thebiohub/sotk2>
+Image registry: <https://hub.docker.com/r/thebiohub/sotk2> <br />
 App source: <https://github.com/Snyder-Institute/sotk2-shiny>
 
 ## Quick start
