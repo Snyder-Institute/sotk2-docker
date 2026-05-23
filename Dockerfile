@@ -4,15 +4,15 @@
 #
 # Build is driven by ./build.sh which targets buildx. Two modes:
 #   ./build.sh local            # native arch only, --load into local docker
-#   ./build.sh push 1.1.0       # multi-arch (linux/amd64 + linux/arm64), --push
+#   ./build.sh push 1.1.1       # multi-arch (linux/amd64 + linux/arm64), --push
 #
 # Run (default mode is FULL - every input live):
-#   docker run --rm -p 11630:11630 thebiohub/sotk2:1.1.0
+#   docker run --rm -p 11630:11630 thebiohub/sotk2:1.1.1
 #   open http://localhost:11630
 #
 # Override at runtime for LITE (browse-only, recompute disabled — used for
 # internal/public-facing deployments):
-#   docker run --rm -p 11630:11630 -e SOTK2_MODE=lite thebiohub/sotk2:1.1.0
+#   docker run --rm -p 11630:11630 -e SOTK2_MODE=lite thebiohub/sotk2:1.1.1
 #
 
 FROM rocker/r-ver:4.5

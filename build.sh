@@ -11,7 +11,7 @@
 #
 #   ./build.sh push   [version]     # build multi-arch (linux/amd64 + linux/arm64)
 #                                   # and push directly to Docker Hub. Tags:
-#                                   #   thebiohub/sotk2:<version>   (default 1.1.0)
+#                                   #   thebiohub/sotk2:<version>   (default 1.1.1)
 #                                   #   thebiohub/sotk2:latest
 #                                   # Requires docker login as a member of the
 #                                   # 'thebiohub' org.
@@ -28,7 +28,7 @@
 set -euo pipefail
 
 MODE="${1:-}"
-VERSION="${2:-1.1.0}"
+VERSION="${2:-1.1.1}"
 IMAGE="thebiohub/sotk2"
 APP_SRC="${APP_SRC:-$HOME/Documents/GitHub/sotk2-shiny}"
 BUILDER="${BUILDER:-sotk2-multiarch}"

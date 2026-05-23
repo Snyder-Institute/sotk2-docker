@@ -10,7 +10,7 @@ App source: <https://github.com/Snyder-Institute/sotk2-shiny>
 The one-command path uses the bundled launcher, which starts the container, waits for the app to be ready, and opens it in your default browser:
 
 ```bash
-docker pull thebiohub/sotk2:1.1.0
+docker pull thebiohub/sotk2:1.1.1
 curl -O https://raw.githubusercontent.com/Snyder-Institute/sotk2-docker/main/launch.sh
 chmod +x launch.sh
 ./launch.sh
@@ -21,8 +21,8 @@ Stop with `docker stop sotk2`.
 If you'd rather invoke `docker` directly:
 
 ```bash
-docker pull thebiohub/sotk2:1.1.0
-docker run --rm -p 11630:11630 thebiohub/sotk2:1.1.0
+docker pull thebiohub/sotk2:1.1.1
+docker run --rm -p 11630:11630 thebiohub/sotk2:1.1.1
 open http://localhost:11630
 ```
 
@@ -35,7 +35,7 @@ The image starts in **FULL mode** by default — every Tutorial input is live (c
 To switch to **LITE mode** — a browse-only experience served against the precomputed analysis, with recompute controls hidden — override at run time:
 
 ```bash
-docker run --rm -p 11630:11630 -e SOTK2_MODE=lite thebiohub/sotk2:1.1.0
+docker run --rm -p 11630:11630 -e SOTK2_MODE=lite thebiohub/sotk2:1.1.1
 ```
 
 LITE mode is intended for public-facing or low-resource deployments where recompute is not desirable.
@@ -55,9 +55,10 @@ Each architecture is ~860 MB; the multi-arch manifest (linux/amd64 + linux/arm64
 |---|---|
 | `1.0.0` | sotk2 R package commit `1cf8155`; ShinyApps-devel app source; no SOTK2_MODE |
 | `1.1.0` | sotk2 R package commit `1cf8155`; sotk2-shiny app source; FULL default, LITE via env override |
+| `1.1.1` | As `1.1.0`; Citation card in the Overview tab now links the published manuscript by title + DOI |
 | `latest` | Whatever the newest released tag is at any moment |
 
-Pin to a specific version in production (`thebiohub/sotk2:1.1.0`), not `latest`.
+Pin to a specific version in production (`thebiohub/sotk2:1.1.1`), not `latest`.
 
 ## Building locally
 
@@ -69,7 +70,7 @@ Rscript scripts/setup_data.R
 # 2. Build the image:
 cd ~/Documents/GitHub/sotk2-docker
 ./build.sh local         # native arch, --load into local docker (fast)
-./build.sh push 1.1.0    # multi-arch (amd64 + arm64), push to Docker Hub
+./build.sh push 1.1.1    # multi-arch (amd64 + arm64), push to Docker Hub
 ```
 
 The `build.sh` wrapper assumes the Shiny app source lives at `~/Documents/GitHub/sotk2-shiny`. Override with `APP_SRC=/your/path ./build.sh local`.
